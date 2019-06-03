@@ -24,17 +24,17 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.showsStatistics = true
         
         // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
+        //let scene = SCNScene(named: "art.scnassets/ship.scn")!
         
         // Set the scene to the view
-        sceneView.scene = scene
+        //sceneView.scene = scene
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         // Create a session configuration
-        let configuration = ARWorldTrackingConfiguration()
+        let configuration = ARFaceTrackingConfiguration()
 
         // Run the view's session
         sceneView.session.run(configuration)
@@ -57,7 +57,48 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         return node
     }
 */
+    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
+        
+        // 3
+        guard let device = sceneView.device else {
+            return nil
+        }
+        
+        // 4
+        let faceGeometry = ARSCNFaceGeometry(device: device)
+        
+        // 5
+        let node = SCNNode(geometry: faceGeometry)
+        
+        // 6
+        //node.geometry?.firstMaterial?.fillMode = .lines
+        node.geometry?.firstMaterial?.diffuse.contents = UIImage(named: "king")
+        //node.geometry?.firstMaterial?.diffuse.contents = sceneView.scene.background.contents
+        node.geometry?.firstMaterial?.lightingModel = .constant
+        
+        
+      
+        // 7
+        return node
+    }
     
+    func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
+        
+        // 2
+        guard let faceAnchor = anchor as? ARFaceAnchor,
+            let faceGeometry = node.geometry as? ARSCNFaceGeometry else {
+                return
+        }
+        
+        // 3
+        faceGeometry.update(from: faceAnchor.geometry)
+        
+//        let gaussianBlurFilter = CIFilter(name: "CIGaussianBlur")
+//        gaussianBlurFilter?.name = "blur"
+//        let pixellateFilter = CIFilter(name:"CIPixellate")
+//        pixellateFilter?.name = "pixellate"
+//        node.filters = [ pixellateFilter ] as? [CIFilter]
+    }
     func session(_ session: ARSession, didFailWithError error: Error) {
         // Present an error message to the user
         
